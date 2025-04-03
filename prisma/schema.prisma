@@ -1,0 +1,72 @@
+
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String       @id @default(uuid())
+  email       String       @unique
+  username    String?
+  avatar_url  String?
+  created_at  DateTime     @default(now())
+  updated_at  DateTime     @updatedAt
+  favorites   Favorite[]
+  watchHistory WatchHistory[]
+}
+
+model Content {
+  id              String    @id @default(uuid())
+  title           String
+  description     String
+  thumbnail_url   String
+  video_url       String
+  duration        Int       // Duration in seconds
+  release_date    DateTime
+  content_type    ContentType
+  genre           String[]
+  actors          String[]
+  director        String?
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  favorites       Favorite[]
+  watchHistory    WatchHistory[]
+}
+
+model Favorite {
+  id          String   @id @default(uuid())
+  user_id     String
+  content_id  String
+  created_at  DateTime @default(now())
+  user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  content     Content  @relation(fields: [content_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, content_id])
+}
+
+model WatchHistory {
+  id          String   @id @default(uuid())
+  user_id     String
+  content_id  String
+  watched_at  DateTime @default(now())
+  progress    Int      // Progress in seconds
+  completed   Boolean  @default(false)
+  user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  content     Content  @relation(fields: [content_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, content_id])
+}
+
+enum ContentType {
+  MOVIE
+  SHOW
+  ANIME
+  CARTOON
+}

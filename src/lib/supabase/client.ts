@@ -1,11 +1,11 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-// Replace with your Supabase URL and anon key - in a real production app, 
-// you would use environment variables
-const supabaseUrl = 'https://your-project-url.supabase.co';
-const supabaseAnonKey = 'your-anon-key';
+// Get environment variables for Supabase
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-project-url.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key';
 
+// Create a Supabase client
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export default supabase;

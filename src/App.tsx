@@ -20,6 +20,7 @@ import Favorites from "./pages/profile/Favorites";
 import Settings from "./pages/profile/Settings";
 import Anime from "./pages/categories/Anime";
 import Cartoons from "./pages/categories/Cartoons";
+import ApiDocs from "./pages/ApiDocs";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,9 @@ const App = () => (
           <Route path="/history" element={<History />} />
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/settings" element={<Settings />} />
+          
+          {/* API Documentation */}
+          <Route path="/api-docs" element={<ApiDocs />} />
           
           {/* Catch-all Route */}
           <Route path="*" element={<NotFound />} />

@@ -1,5 +1,6 @@
 
 import supabase from './client';
+import prisma from '../lib/prisma';
 
 export type User = {
   id: string;
@@ -15,6 +16,17 @@ export async function signUp(email: string, password: string) {
   });
   
   if (error) throw error;
+  
+  // Create user in Prisma if signup succeeded
+  if (data.user) {
+    await prisma.user.create({
+      data: {
+        id: data.user.id,
+        email: data.user.email || '',
+        username: email.split('@')[0], // Default username from email
+      },
+    });
+  }
   
   return data;
 }
@@ -44,10 +56,23 @@ export async function resetPassword(email: string) {
 }
 
 export async function updateProfile(user: Partial<User>) {
-  const { data, error } = await supabase
-    .from('profiles')
-    .update(user)
-    .eq('id', user.id);
+  // Update in Supabase auth if it's just for email
+  if (user.email) {
+    const { error } = await supabase.auth.updateUser({
+      email: user.email,
+    });
+    
+    if (error) throw error;
+  }
+  
+  // Update user in Prisma database
+  const { data, error } = await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      username: user.username,
+      avatar_url: user.avatar_url,
+    },
+  });
     
   if (error) throw error;
   
@@ -59,12 +84,15 @@ export async function getCurrentUser(): Promise<User | null> {
   
   if (!user) return null;
   
-  // Get the user profile from the profiles table
-  const { data } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', user.id)
-    .single();
+  // Get the user profile from Prisma
+  try {
+    const userData = await prisma.user.findUnique({
+      where: { id: user.id },
+    });
     
-  return data;
+    return userData;
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    return null;
+  }
 }
