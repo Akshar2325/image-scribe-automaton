@@ -1,6 +1,13 @@
 
 import prisma from '../lib/prisma';
-import { ContentType } from '@prisma/client';
+
+// Define ContentType enum locally to avoid dependency on @prisma/client
+export enum ContentType {
+  MOVIE = "MOVIE",
+  SHOW = "SHOW",
+  ANIME = "ANIME",
+  CARTOON = "CARTOON"
+}
 
 export interface ContentParams {
   type?: ContentType;
